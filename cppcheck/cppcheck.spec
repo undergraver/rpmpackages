@@ -19,17 +19,17 @@ errors in the code (i.e. have zero false positives).
 %install
 pushd %{_makedir}
   
-make DESTDIR=$RPM_BUILD_ROOT FILESDIR=/usr/share/cppcheck install
+make DESTDIR=$RPM_BUILD_ROOT FILESDIR=/usr/share/cppcheck install -j %{_num_cpus}
   
 popd
   
 pushd $RPM_BUILD_ROOT
   
-find . -type d -name cppcheck > %{templist}
+find . ! -path . -type d -exec echo %dir {} \; > %{templist}
 find . -type f >> %{templist}
   
 # remove the starting dot
-cat %{templist} | cut -d . -f 2- > %{finallist}
+cat %{templist} | sed 's/\.\//\//g' > %{finallist}
   
 %files -f %{finallist}
  
